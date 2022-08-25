@@ -196,10 +196,11 @@
 
 								<div class="text-center">
 
-									<input type='file' id='fileupload' name="fileupload[]" multiple="multiple" accept=".png, .jpg, .jpeg" />
-									//input multiple files
+									<input type='file' id='fileupload' name="fileupload[]"
+										multiple="multiple" accept=".png, .jpg, .jpeg" />
+
 									<div id="uploadedList" class='uploadedList'></div>
-										//placeforuploadedimages
+
 									<button id="submitReview" type="submit"
 										class="btn btn-main text-center">submit Comment</button>
 								</div>
@@ -306,8 +307,6 @@
 	<!-- TESTSECTION -->
 
 
-//commentlist
-
 <script id="template" type="text/x-handlebars-template">
 
 {{#each .}}
@@ -318,9 +317,15 @@
   </span>
   <h4 class="comment-author"> <a href="https://www.google.com/search?q={{mid}}">{{mid}}</a></h4>
   <div class="timeline-body">{{content}} </div>
+<span id = "testspan{{rno}}">
+<img src onerror="imgonerrorfunction('{{rno}}')" >
+</span>
 
-<a class="pull-right" style="cursor:pointer;" data-toggle="collapse" data-target="#commentupdate${rno}"
+<a style="border:solid" class="pull-right" style="cursor:pointer;" onClick="deleteReview({{rno}})"><i
+		class="tf-ion-chatbubbles"></i>Delete</a>
+<a style="border:solid" class="pull-right" style="cursor:pointer;" data-toggle="collapse" data-target="#commentupdate${rno}"
 	onClick="hideReviewText(${rno})"><i class="tf-ion-chatbubbles"></i>Update</a>
+</br>
 <div id="commentupdate${rno}" class="collapse">
 	<form class="text-left clearfix" action="<%=request.getContextPath()%>/#" method="post">
 		<div class="form-group">
@@ -332,8 +337,7 @@
 	</form>
 </div>
 <br>
-<a class="pull-right" style="cursor:pointer;" onClick="deleteReview(${rno})"><i
-		class="tf-ion-chatbubbles"></i>Delete</a>
+
 
 
 
@@ -368,8 +372,10 @@
 		var pid = 189;
 
 		var replyPage = 1;
+		
+		
 
-		function getPage(pageInfo) {
+ 		function getPage(pageInfo) {
 			$.getJSON(pageInfo, function(data) {
 				printData(data.list, $("#post-comments"), $('#template'));
 				printPaging(data.commentPageMaker, $(".pagination"));
@@ -399,6 +405,56 @@
 
 			target.html(str);
 		};
+		
+		
+		
+		function deletereview(rno){
+			
+		}
+		
+
+		
+		function imgonerrorfunction(rno){
+			$.getJSON('<%= request.getContextPath() %>/reviews/getAttach/'+rno,function(list){
+				$(list).each(function(){
+					
+					var imagetemplate = Handlebars.compile($("#template").html());
+					
+					var fileInfo = getFileInfo(this);
+					
+					var html = imagetemplate(fileInfo);
+					//console.log(fileInfo);
+					
+					var refinestr = "<a href="+fileInfo.getLink+"><img src="+fileInfo.imgsrc+" '/>"
+					
+					console.log(refinestr);
+					//dynamical
+					$("#testspan"+rno).append(refinestr);
+					//$(this).parent().append(html);
+				});
+				
+				});
+			};
+			
+			function getFileInfo(fullName){
+				var fileName,imgsrc, getLink;
+				
+				var fileLink;
+				 	
+				
+				    //staticvalue
+					imgsrc = "/mealkit/displayFile?fileName="+fullName;
+					fileLink = fullName.substr(14);
+					
+					var front = fullName.substr(0,12); // /2015/07/01/ 
+					var end = fullName.substr(14);
+					
+					getLink = "/mealkit/displayFile?fileName="+front + end;
+					
+				fileName = fileLink.substr(fileLink.indexOf("_")+1);
+				return  {fileName:fileName, imgsrc:imgsrc, getLink:getLink, fullName:fullName};
+				
+			}
 
 		$("#reviewsDiv").on("click", function() {
 			window.alert("reviewsdiv");
@@ -419,7 +475,7 @@
 
 			replyPage = $(this).attr("href");
 
-			getPage("<%=request.getContextPath()%>/reviews/" + 189 + "/" + replyPage);
+			getPage("<%=request.getContextPath() %>/reviews/" + 189 + "/" + replyPage);
 
 		});
 		
@@ -433,17 +489,10 @@
 				} 
 		 }); */
 		
-			function deleteFnc(fname){
-				window.alert(fname);
-			}
-		
-		//variable FormData for ajax imagepost
 		 var formData = new FormData();
-		 
-		 //neverused
 		 var filelist;
 		 var i = 0;
-		 //image storing Array.prototype 
+		 
 		 var storeimg = new Array();
 		 
 			$("#fileupload").on("change",function handleImgFileSelect(e) {
@@ -460,16 +509,13 @@
 				
 				
 		       	var ufiles = e.target.files;
-		        //slicecall
-				var filesArr = Array.prototype.slice.call(ufiles);
-				//regex for file extensioncheck
+		        var filesArr = Array.prototype.slice.call(ufiles);
+		 
 		        var reg = /(.*?)\/(jpg|jpeg|png|bmp)$/;
 		        
-				//neverused
 		        var sel_file;
 		        var fString = "";
 		 
-				//loop
 		        filesArr.forEach(function(f) {
 		            if (!f.type.match(reg)) {
 		                alert("확장자는 이미지 확장자만 가능합니다.");
@@ -485,11 +531,11 @@
 						fr.readAsDataURL(this.files[i]);
 					} */	
 		 
-					//storeimage 
+					
 					storeimg.push(f);
 					
 					console.log('foundfile=' + f.name);
-					//filereader
+					
 		            var reader = new FileReader();
 		            
 		            reader.readAsDataURL(f);
@@ -502,7 +548,6 @@
 		            	
 		            	  $(".uploadedList").append(spn);
 		            	  
-						  
 		            	  del.click(function(event){
 		            		var clicked = $(this);
 		            		
@@ -511,7 +556,6 @@
 		            		
 		            		clicked.parent().remove()
 		            		
-							//select and save element(=images).name
 		            		storeimg = storeimg.filter(function (el){
 		            			return el.name != imgname;
 		            		});
@@ -527,8 +571,8 @@
 			
 		 $("#submitReview").on("click", function(event) {
 			 event.preventDefault();
-			 var vals = [];
-			 //convert filename string
+			var vals = [];
+			//savefilename as string
 			 
 			//var reviewObj = 
 			var reviewtextObj = $("#submitReviewWriter");
@@ -543,10 +587,17 @@
 			var mId = 'admin';
 			
 			for(var i = 0; i < storeimg.length ; i ++){
+				
+				
+/* 				var uuid = function uuidv4() {
+					  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+					    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+					  );
+					} */
+				
 				console.log('foundfile' + i + '=' + storeimg[i].name);
 				formData.append("fileupload[]",storeimg[i]);
-				//push element name values
-				vals.push(storeimg[i].name);
+				//vals.push(storeimg[i].name);
 			}
 
 			//document.getElementById("fileupload").removeChild();
@@ -569,67 +620,78 @@
 			formData.append("fileupload",$("#fileupload")[i].files[i]);
 			} */
 			//formData.append("fileupload",$("#fileupload")[0].files[0]);
+			var data = {
+					"contents" : $("#contents").val()
+			}
+			
+			formData.append('key',new Blob([JSON.stringify(data)],{type:"application/json"}));
+			
 			$.ajax({
-				type:'post',
-				url:'<%=request.getContextPath()%>/reviews/',
-				headers: {
-					"Content-Type" : "application/json",
-					"X-HTTP-Method-Override" : "POST" },
+				url: '<%=request.getContextPath()%>/uploadAjax',
+				data : formData,
+				processData: false,
+				contentType: false,
+				enctype: 'multipart/form-data',
+				async : false,
+				type: 'POST',
+				success: function(result){
+					console.log(result);
 					
-					dataType:'text',
-					data: JSON.stringify({pid:pid,mid:mId,content:reviewtext,regdate: 'sysdate',files:vals}),
-					success:function(result){
+					//alert(result[0].filename);
+					
+					for(var i = 0 ; i < result.length ; i ++){
 						
-						console.log("result: " + result);
+						vals.push(result[i].filename);
+						console.log(result[i].filename);
 						
-						if(result == 'SUCCESS'){
-							alert("posted");
-							replyPage = 1;
-							
-							$.ajax({
-									url: '<%=request.getContextPath()%>/uploadAjax',
-									data : formData,
-									processData: false,
-									contentType: false,
-									enctype: 'multipart/form-data',
-									type: 'POST',
-									success: function(result){
-										//$(".uploadedList").removeChild();
-										console.log(result);
+					}
+					
+					//$(".uploadedList").removeChild();
+					
+					
+					document.getElementById("fileupload").value = "";
+					
+					//resetvalues
+/* 										 var resultstring = "";
+					 for(){
+					 resultstring = "<div><a href=displayFile?fileName="+
+							 
+							 
+					 } */
+							 
+					 $.ajax({
+							type:'post',
+							url:'<%=request.getContextPath()%>/reviews/',
+							headers: {
+								"Content-Type" : "application/json",
+								"X-HTTP-Method-Override" : "POST" },
+								
+								dataType:'text',
+								data: JSON.stringify({pid:pid,mid:mId,content:reviewtext,regdate: 'sysdate',files:vals}),
+								success:function(result){
+									
+									console.log("result: " + result);
+									
+									if(result == 'SUCCESS'){
+										//alert("posted");
+										replyPage = 1;
 										
-										document.getElementById("fileupload").value = "";
-										
-										//resetvalues
-																				
-										const mNode = document.getElementById("uploadedList");
-										mNode.textContent = '';
-										
-										 formData = new FormData();
-										 storeimg = new Array();
-										
-										/*  var str = "";
-										
-										if(checkImageType(data)){
-											str = "<div><a href=displayFile?fileName="+getImageLink(data)+">"
-													+"<img src='displayFile?fileName="+data+"' />"
-													+"</a><small data-src="+data+">X</small></div>";
-										}else{
-											  str = "<div><a href='displayFile?fileName="+data+"'>" 
-											  + getOriginalName(data)+"</a>"
-											  +"<small data-src="+data+">X</small></div></div>";
-										  }
-										  $(".uploadedList").append(str);  */
-									 
-									 }				 
-							 });
-							
-							
-							getPage( "<%=request.getContextPath()%>/reviews/" + pid + "/" + replyPage);
-								reviewtextObj.val("");
-											}
-										}
-								});
-						});
+										getPage( "<%=request.getContextPath()%>/reviews/" + pid + "/" + replyPage);
+											reviewtextObj.val("");
+														}
+													}
+											});
+					
+					const mNode = document.getElementById("uploadedList");
+					mNode.textContent = '';
+					
+					 formData = new FormData();
+					 storeimg = new Array();
+				 
+					 
+							 }				 
+					 });
+				});
 		 
 		 
 		 
