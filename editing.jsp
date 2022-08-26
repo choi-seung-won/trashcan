@@ -14,7 +14,6 @@
 input[type="file"] {
 	display: none;
 }
-
 .custom-file-upload {
 	position: relative;
 	left: auto;
@@ -135,16 +134,11 @@ input[type="file"] {
 //var mId = "admin";
 var pid = ${productOne.PId};
 var replyPage = 1;
-
 		$(document).ready(function() {
-
 			var formObj = $("form[role='form']");
-
 			console.log(formObj);
-
 			//static value for test
 			//
-
 			var template = Handlebars.compile($("#templateAttach").html());
 	
 			
@@ -154,13 +148,14 @@ var replyPage = 1;
 			
 			function loadComment (){
 			//window.alert("reviewsdiv");
-
 			/* if ($(".timeline li").size() > 1) {
 				return;
 			} */
 			getPage("<%=request.getContextPath()%>/reviews/" + pid + "/1");
 			// 189 = pid
-		}
+			}
+			
+			
 			
 			
 	});
@@ -228,6 +223,8 @@ var replyPage = 1;
 								<script
 									src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.js"></script>
 								<!-- 동적으로 생성된 영역을 selector로 참조하기위하여 고유값(rno)를id에부여 -->
+<!-- https://stackoverflow.com/questions/34252817/handlebarsjs-check-if-a-string-is-equal-to-a-value -->
+
 <script id="template" type="text/x-handlebars-template">
 
 {{#each .}}
@@ -239,24 +236,14 @@ var replyPage = 1;
   </span>
   <h4 class="comment-author"> <a href="https://www.google.com/search?q={{mid}}">{{mid}}</a></h4>
 
-<c:if test="${sessionScope.member.MId == {{mid}} }">
+
+{{#ifEquals mid}}
 <a id = "targetdelete{{rno}}" style="border:solid" class="pull-right" style="cursor:pointer;" onclick="deleteReview('{{rno}}')"><i
 		class="tf-ion-chatbubbles"></i>Delete</a>
 
 
 <a style="border:solid" class="pull-right" style="cursor:pointer;" onclick="modifyReview('{{rno}}','{{mid}}')" ><i class="tf-ion-chatbubbles"></i>Update</a>
-</c:if>
-<%-- <div id="commentupdate{{rno}}" class="collapse">
-	<form class="text-left clearfix" action="<%=request.getContextPath()%>/#" method="post">
-		<div class="form-group">
-			<input type="text" name="contentmodify" class="form-control" value="${content}" placeholder="CommentUpdate">
-			<div class="text-center">
-				<button type="submit" class="btn btn-main text-center">Update Comment</button>
-			</div>
-		</div>
-	</form>
-</div> --%>  
-
+{{/ifEquals}}
 
 <div class="timeline-body">{{content}} </div>
 <span id = "targetspan{{rno}}">
@@ -282,45 +269,34 @@ function getPage(pageInfo) {
 	$.getJSON(pageInfo, function(data) {
 		printData(data.list, $("#post-comments"), $('#template'));
 		printPaging(data.commentPageMaker, $(".pagination"));
-
 	});
 }
 
+
+
 var printData = function(reviewsArr, target, templateObject) {
 	var template = Handlebars.compile(templateObject.html());
-
 	var html = template(reviewsArr);
 	$(".replyLi").remove();
 	target.after(html);
-
 }
-
-
 var printPaging = function(commentPageMaker, target) {
-
 	var str = "";
-
 	if (commentPageMaker.prev) {
 		str += "<li><a href='" + (commentPageMaker.startPage - 1)
 				+ "'> << </a></li>";
 	}
-
 	for (var i = commentPageMaker.startPage, len = commentPageMaker.endPage; i <= len; i++) {
 		var strClass = commentPageMaker.cri.page == i ? 'class=active'
 				: '';
 		str += "<li "+strClass+"><a href='"+i+"'>" + i + "</a></li>";
 	}
-
 	if (commentPageMaker.next) {
 		str += "<li><a href='" + (commentPageMaker.endPage + 1)
 				+ "'> >> </a></li>";
 	}
-
 	target.html(str);
 };
-
-
-
 function deleteReview(rno){
 	
 	var mId = "${member.MId}";
@@ -374,8 +350,6 @@ function deleteReview(rno){
 		});
 		
 	}};
-
-
 //template의 추가사용없이 동적으로 이미지를 로드하기위하여 append로처리
 function imgonerrorfunction(rno){
 	$.getJSON('<%=request.getContextPath()%>/reviews/getAttach/'+rno,function(list){
@@ -397,8 +371,6 @@ function imgonerrorfunction(rno){
 		
 		});
 	};
-
-
 	
 	function getFileInfo(fullName){
 		var fileName,imgsrc, getLink;
@@ -418,37 +390,26 @@ function imgonerrorfunction(rno){
 		return  {fileName:fileName, imgsrc:imgsrc, getLink:getLink, fullName:fullName};
 		
 	}
-
 $("#reviewsDiv").on("click", function() {
 	//window.alert("reviewsdiv");
-
 	/* if ($(".timeline li").size() > 1) {
 		return;
 	} */
 	getPage("<%=request.getContextPath()%>/reviews/" + pid + "/1");
 	// 189 = pid
-
 });
-
 $(".pagination").on("click", "li a", function(event) {
-
 	//window.alert("pagination");
-
 	event.preventDefault();
-
 	replyPage = $(this).attr("href");
-
 	getPage("<%=request.getContextPath()%>/reviews/"+pid+ "/" + replyPage);
-
 });
-
  var formData = new FormData();
  var filelist;
  
  var storeimg = new Array();
  
 	$("#fileupload").on("change",function handleImgFileSelect(e) {
-
 		filelist = document.getElementById("fileupload").files || [];
 		
        	var ufiles = e.target.files;
@@ -465,7 +426,6 @@ $(".pagination").on("click", "li a", function(event) {
                 document.getElementById("fileupload").value = "";
                 return;
             }
-
 			storeimg.push(f);
 			
 			console.log('foundfile=' + f.name);
@@ -498,8 +458,6 @@ $(".pagination").on("click", "li a", function(event) {
         }); 
 		
 	});
-
-
 	
  $("#submitReview").on("click", function(event) {
 	 event.preventDefault();
@@ -540,7 +498,6 @@ $(".pagination").on("click", "li a", function(event) {
 		formData.append("fileupload[]",storeimg[i]);
 		//vals.push(storeimg[i].name);
 	}
-
 	var data = {
 			"contents" : $("#contents").val()
 	}
@@ -553,7 +510,7 @@ $(".pagination").on("click", "li a", function(event) {
 		data : formData,
 		processData: false,
 		contentType: false,
-		enctype: 'multipart/form-data',
+		enctype: 'multipart/form-data',
 		async : false,
 		type: 'POST',
 		success: function(result){
@@ -571,7 +528,6 @@ $(".pagination").on("click", "li a", function(event) {
 			//$(".uploadedList").removeChild();
 			
 			document.getElementById("fileupload").value = "";
-
 			 $.ajax({
 					type:'post',
 					url:'<%=request.getContextPath()%>/reviews/',
@@ -616,7 +572,6 @@ $(".pagination").on("click", "li a", function(event) {
 	 	$('#cModifyModal').modal('show');
 		
 	};
-
 function modifyConfirm(){
 	
 	var modifytext = $("#ModifyReviewContent").val();
@@ -632,6 +587,13 @@ function modifyConfirm(){
 	
 };
 	
+Handlebars.registerHelper('ifEquals',function(arg1,options){
+	
+	var a = "${member.MId}";
+	
+	return (arg1 == a) ? options.fn(this) : options.inverse(this);
+});
+
 </script>
 
 								<div class="modal fade" id="cModifyModal" tabindex="-1"
